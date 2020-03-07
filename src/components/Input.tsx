@@ -7,6 +7,8 @@ interface InputProps {
   className?: string;
   name?: string;
   value: string | number;
+  min?: number | string;
+  max?: number | string;
 }
 export default ({
   type,
@@ -14,7 +16,9 @@ export default ({
   placeholder,
   name,
   className,
-  value
+  value,
+  min,
+  max
 }: InputProps) => (
   <>
     <input
@@ -23,6 +27,8 @@ export default ({
       placeholder={placeholder}
       name={name}
       value={value}
+      min={min}
+      max={max}
       className={`w-full h-16 border-b border-b-2 shadow p-3 ${className}`}
     />
   </>

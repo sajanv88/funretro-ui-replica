@@ -19,6 +19,7 @@ export interface BoardProps {
   templates: BoardColumn[];
   userId?: number;
   onDelete: (id: number) => void;
+  onClone: (id: number) => void;
 }
 
 export interface CreateBoardDto {
@@ -51,31 +52,45 @@ const onShareClicked = async function(e: MouseEvent<HTMLSpanElement>) {
   }
 };
 
-export default ({ name, id, salt, createdAt, onDelete }: BoardProps) => (
+export default ({
+  name,
+  id,
+  salt,
+  createdAt,
+  onDelete,
+  onClone
+}: BoardProps) => (
   <Card title={name} shouldClickable>
-    <div className="flex flex-col">
-      <span className="block mb-5 text-gray-800">
-        <i className="fa fa-clock" aria-hidden="true" />
-        <span className="pl-1">
-          {formatDistance(
-            subDays(new Date(createdAt), 0),
-            new Date()
-          ).toUpperCase()}
-        </span>
-      </span>
-      <div className="flex justify-between items-center">
-        <span className="inline-block cursor-pointer text-gray-600 hover:text-gray-800">
-          <i className="fa fa-share-alt" aria-hidden="true"></i>
-          <span className="pl-2" data-link={salt} onClick={onShareClicked}>
-            Share
+    <div className="flex flex-col h-full">
+      <span className="block mt-2 mb-2 text-gray-800">
+        <span className="block text-center">
+          <i className="fa fa-clock" aria-hidden="true" />
+          <span className="pl-1">
+            {formatDistance(
+              subDays(new Date(createdAt), 0),
+              new Date()
+            ).toUpperCase()}
           </span>
         </span>
-        <span className="inline-block cursor-pointer text-gray-600 hover:text-gray-800">
+      </span>
+      <div className="flex justify-around lg:justify-between items-center">
+        <span
+          className="inline-block mt-2 cursor-pointer text-gray-600 hover:text-gray-800"
+          data-link={salt}
+          onClick={onShareClicked}
+        >
+          <i className="fa fa-share-alt" aria-hidden="true"></i>
+          <span className="pl-2">Share</span>
+        </span>
+        <span
+          className="inline-block mt-2 cursor-pointer text-gray-600 hover:text-gray-800"
+          onClick={() => onClone(id)}
+        >
           <i className="fa fa-clone" aria-hidden="true"></i>
           <span className="pl-2">Clone</span>
         </span>
         <span
-          className="inline-block cursor-pointer text-red-600 hover:text-red-800"
+          className="inline-block mt-2 cursor-pointer text-red-600 hover:text-red-800"
           onClick={() => onDelete(id)}
         >
           <i className="fa fa-trash" aria-hidden="true"></i>

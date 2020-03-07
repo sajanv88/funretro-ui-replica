@@ -5,6 +5,7 @@ interface ButtonProps {
   onClickEvent?: (e: MouseEvent) => void;
   isDisabled?: boolean;
   icon?: string;
+  className?: string;
 }
 export const PrimaryBtn = ({
   label,
@@ -15,7 +16,7 @@ export const PrimaryBtn = ({
 }: ButtonProps) => (
   <button
     className={`bg-blue-800 h-12 w-full hover:bg-blue-700 text-white uppercase tracking-wider ${
-      isDisabled ? "opacity-50 cursor-not-allowed" : ""
+      isDisabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
     }`}
     onClick={onClickEvent}
     name={name}
@@ -29,12 +30,13 @@ export const SecondaryBtn = ({
   onClickEvent,
   name,
   isDisabled,
-  icon
+  icon,
+  className
 }: ButtonProps) => (
   <button
     className={`bg-orange-600 h-12 w-full hover:bg-orange-500 text-white uppercase tracking-wider px-3 ${
       isDisabled ? "opacity-50 cursor-not-allowed" : ""
-    }`}
+    } ${className}`}
     onClick={onClickEvent}
     name={name}
   >

@@ -53,6 +53,18 @@ export default () => {
         console.log(e);
         throw e;
       }
+    },
+    cloneBoard: async (id: number) => {
+      let response = null;
+      try {
+        response = await Api.get(`/board/clone/${id}`, {
+          headers: { ...Headers, ...getAuthorization() }
+        });
+        return response;
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
     }
   };
 };

@@ -8,13 +8,14 @@ import Input from "./Input";
 import Alert, { Status } from "./Alert";
 import CheckBox from "./CheckBox";
 import Api from "../api/Profile";
+import { useHistory } from "react-router-dom";
 
 const api = Api();
 
 const Profile = () => {
   const auth = useAuth();
   const { user } = auth;
-
+  const route = useHistory();
   const [showModal, setModal] = useState(false);
   const [showAlert, setAlert] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
@@ -41,8 +42,7 @@ const Profile = () => {
       }
     ]
   });
-  const template: string =
-    "what went well => what didn't go well => Action items";
+
   useEffect(() => {
     if (user) {
       setBoards([...user.boards]);
@@ -62,12 +62,23 @@ const Profile = () => {
       setErrorAlert(true);
       throw e;
     }
-    console.log(options);
   };
 
   const onBoardDelete = async function(id: number) {
     try {
       await api.deleteBoard(id);
+      const board = boards.find(o => o.id === id);
+      const idx = boards.indexOf(board as Board);
+      boards.splice(idx, 1);
+      setBoards([...boards]);
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const onBoardClone = async function(id: number) {
+    try {
+      await api.cloneBoard(id);
       const newBoards = await api.getBoards();
       setBoards(newBoards);
     } catch (e) {
@@ -103,17 +114,23 @@ const Profile = () => {
       window.removeEventListener(BOARD_EVENT.COPIED, copiedLinkEvent);
     }, 4000);
   });
+
+  const navigateTo = function(signature: string) {
+    route.push(`/public/${signature}`);
+  };
+
   return (
     <div id="profile">
       <Model
-        title="Create a board"
+        title=""
         onCancel={() => {
           setModal(false);
         }}
         onSave={onSaveBoard}
         show={showModal}
+        shouldDisableBtn={options.name === ""}
       >
-        <Card title="">
+        <Card title="Create a board">
           <div className="flex flex-col">
             {errorAlert && (
               <Alert
@@ -123,7 +140,11 @@ const Profile = () => {
                 <h1>Failed to create.</h1>
               </Alert>
             )}
-            <div>
+            <div className="py-3">
+              <span className="text-gray-700">
+                minimum 5 characters required
+                <em className="text-red-600 pl-1">*</em>
+              </span>
               <Input
                 type="text"
                 name="name"
@@ -132,18 +153,22 @@ const Profile = () => {
                 onChangeEvent={onChangeHandler}
               />
             </div>
-            <div>
+            <div className="py-3">
+              <span className="text-gray-700">
+                minimum 3 and maximum 6 votes per board
+                <em className="text-red-600 pl-1">*</em>
+              </span>
               <Input
                 type="number"
                 name="votes"
                 value={Number(options.votes)}
                 placeholder="No of votes"
+                min={3}
+                max={6}
                 onChangeEvent={onChangeHandler}
               />
             </div>
-            <div className="py-5 text-center">
-              <span className="text-2xl">{template}</span>
-            </div>
+
             <div className="py-5">
               <div className="flex items-center justify-around">
                 <CheckBox
@@ -177,9 +202,13 @@ const Profile = () => {
           <h1>Public board link copied!!</h1>
         </Alert>
       )}
-      <div className="grid grid-flow-row-dense grid-cols-3 gap-10">
+      <div className="flex flex-col md:flex-row flex-wrap -mx-2 overflow-hidden">
         {boards.map(o => (
-          <div key={o.id}>
+          <div
+            key={o.id}
+            onClick={() => navigateTo(o.salt)}
+            className="my-2 px-2 w-full md:overflow-hidden md:w-1/3 lg:w-1/2 xl:w-1/3"
+          >
             <BoardBox
               name={o.name}
               id={o.id}
@@ -187,6 +216,7 @@ const Profile = () => {
               createdAt={o.createdAt}
               templates={o.templates}
               onDelete={onBoardDelete}
+              onClone={onBoardClone}
             />
           </div>
         ))}

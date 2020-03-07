@@ -1,15 +1,19 @@
 import React, { MouseEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/context";
 import { SecondaryBtn } from "./Button";
 
 const Header = () => {
   const auth = useAuth();
+  const { pathname } = useLocation();
   const { user } = auth;
   const logoutHandler = function(e: MouseEvent) {
     window.localStorage.removeItem("token");
     window.location.reload();
   };
+  if (pathname.includes("public")) {
+    return <div className=" bg-gray-800 h-12"></div>;
+  }
   return (
     <header className="mb-24">
       <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6 fixed w-full z-10 top-0">
