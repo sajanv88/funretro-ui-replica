@@ -11,6 +11,7 @@ import Layout from "./components/Layout";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
+import NotFound from "./components/NotFound";
 
 import PublicBoard from "./components/PublicBoard";
 
@@ -27,10 +28,18 @@ function LayoutWrapper() {
               exact
               path="/public/:signature"
               render={props => (
-                <PublicBoard signature={props.match.params.signature} />
+                <PublicBoard
+                  router={props}
+                  signature={window.encodeURIComponent(
+                    props.match.params.signature
+                  )}
+                />
               )}
               strict
             ></Route>
+            <Route exact path="/not-found" strict>
+              <NotFound />
+            </Route>
             {!user && (
               <>
                 <Route exact path="/signup" strict>
@@ -40,7 +49,7 @@ function LayoutWrapper() {
                   <Login />
                 </Route>
                 <Route path="*">
-                  <Redirect to="/login" />
+                  <Redirect to="/signup" />
                 </Route>
               </>
             )}

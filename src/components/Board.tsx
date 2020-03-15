@@ -1,5 +1,6 @@
 import React, { MouseEvent } from "react";
 import { formatDistance, subDays } from "date-fns";
+import { copyLink } from "../utils";
 import Card from "./Card";
 import { BoardColumn } from "../context/context";
 
@@ -41,11 +42,12 @@ export enum BOARD_EVENT {
 }
 
 const onShareClicked = async function(e: MouseEvent<HTMLSpanElement>) {
-  const span = e.target as HTMLSpanElement;
-  let link = `${window.location.protocol}//${window.location.host}/`;
-  link += span.getAttribute("data-link") as string;
+  // const span = e.target as HTMLSpanElement;
+  // const link = span.getAttribute("data-link") as string;
+
+  e.stopPropagation();
   try {
-    await navigator.clipboard.writeText(link);
+    await copyLink();
     window.dispatchEvent(new Event(BOARD_EVENT.COPIED));
   } catch (e) {
     throw e;
@@ -84,14 +86,20 @@ export default ({
         </span>
         <span
           className="inline-block mt-2 cursor-pointer text-gray-600 hover:text-gray-800"
-          onClick={() => onClone(id)}
+          onClick={(e: MouseEvent) => {
+            e.stopPropagation();
+            onClone(id);
+          }}
         >
           <i className="fa fa-clone" aria-hidden="true"></i>
           <span className="pl-2">Clone</span>
         </span>
         <span
           className="inline-block mt-2 cursor-pointer text-red-600 hover:text-red-800"
-          onClick={() => onDelete(id)}
+          onClick={(e: MouseEvent) => {
+            e.stopPropagation();
+            onDelete(id);
+          }}
         >
           <i className="fa fa-trash" aria-hidden="true"></i>
           <span className="pl-2">Delete</span>

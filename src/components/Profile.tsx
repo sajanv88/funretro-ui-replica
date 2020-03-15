@@ -1,4 +1,5 @@
 import React, { useState, MouseEvent, SyntheticEvent, useEffect } from "react";
+import { withRouter, RouteChildrenProps, Redirect } from "react-router-dom";
 import { useAuth, Board } from "../context/context";
 import ToolBar from "./Toolbar";
 import BoardBox, { BOARD_EVENT, CheckBoxEnum } from "./Board";
@@ -8,18 +9,17 @@ import Input from "./Input";
 import Alert, { Status } from "./Alert";
 import CheckBox from "./CheckBox";
 import Api from "../api/Profile";
-import { useHistory } from "react-router-dom";
 
 const api = Api();
 
-const Profile = () => {
+const Profile = ({ history }: RouteChildrenProps) => {
   const auth = useAuth();
   const { user } = auth;
-  const route = useHistory();
   const [showModal, setModal] = useState(false);
   const [showAlert, setAlert] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
+  const [url, setUrl] = useState<string>("");
 
   const [options, setOptions] = useState({
     disableVotes: false,
@@ -52,6 +52,7 @@ const Profile = () => {
   const onCreateABoard = function(e: MouseEvent) {
     setModal(true);
   };
+
   const onSaveBoard = async function(e: MouseEvent) {
     try {
       await api.saveBoard(options);
@@ -115,9 +116,9 @@ const Profile = () => {
     }, 4000);
   });
 
-  const navigateTo = function(signature: string) {
-    route.push(`/public/${signature}`);
-  };
+  if (url) {
+    return <Redirect to={url} />;
+  }
 
   return (
     <div id="profile">
@@ -206,7 +207,9 @@ const Profile = () => {
         {boards.map(o => (
           <div
             key={o.id}
-            onClick={() => navigateTo(o.salt)}
+            onClick={() =>
+              setUrl(`/public/${window.encodeURIComponent(o.salt)}`)
+            }
             className="my-2 px-2 w-full md:overflow-hidden md:w-1/3 lg:w-1/2 xl:w-1/3"
           >
             <BoardBox
@@ -225,4 +228,4 @@ const Profile = () => {
   );
 };
 
-export default React.memo(Profile);
+export default withRouter(Profile);

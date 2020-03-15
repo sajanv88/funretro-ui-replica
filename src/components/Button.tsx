@@ -35,7 +35,7 @@ export const SecondaryBtn = ({
 }: ButtonProps) => (
   <button
     className={`bg-orange-600 h-12 w-full hover:bg-orange-500 text-white uppercase tracking-wider px-3 ${
-      isDisabled ? "opacity-50 cursor-not-allowed" : ""
+      isDisabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
     } ${className}`}
     onClick={onClickEvent}
     name={name}
