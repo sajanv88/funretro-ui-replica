@@ -42,12 +42,11 @@ export enum BOARD_EVENT {
 }
 
 const onShareClicked = async function(e: MouseEvent<HTMLSpanElement>) {
-  // const span = e.target as HTMLSpanElement;
-  // const link = span.getAttribute("data-link") as string;
-
   e.stopPropagation();
+  const span = e.currentTarget as HTMLSpanElement;
+  const link = span.getAttribute("data-link") as string;
   try {
-    await copyLink();
+    await copyLink(link);
     window.dispatchEvent(new Event(BOARD_EVENT.COPIED));
   } catch (e) {
     throw e;

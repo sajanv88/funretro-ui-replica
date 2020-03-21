@@ -5,6 +5,7 @@ import { PrimaryBtn, SecondaryBtn } from "./Button";
 import Card from "./Card";
 import Input from "./Input";
 import Alert, { Status } from "./Alert";
+import { isEmailValid } from "../utils";
 
 export default () => {
   const router = useHistory();
@@ -13,6 +14,7 @@ export default () => {
   const [successObj, setsuccessObj] = useState({
     showAlert: false
   });
+  const [fieldError, setFieldError] = useState(false);
 
   const [btnDisable, setBtnDisable] = useState(true);
   const [formFields, setFormFields] = useState({
@@ -23,7 +25,10 @@ export default () => {
 
   const onSignupClicked = async function(e: MouseEvent) {
     if (btnDisable) return;
-
+    if (!isEmailValid(formFields.email)) {
+      setFieldError(true);
+      return;
+    }
     try {
       await api.signup(formFields);
       setFormFields({
@@ -69,7 +74,7 @@ export default () => {
   };
 
   return (
-    <div className="m-2 self-center w-1/2">
+    <div className="m-2 self-center w-full md:w-1/2">
       {errorObj.showAlert && (
         <Alert status={Status.DANGER} callbackHandler={onAlertDismiss}>
           {errorObj.message}
@@ -98,6 +103,11 @@ export default () => {
             value={formFields.email}
             onChangeEvent={onInputChange}
           />
+          {fieldError && (
+            <span className="text-red-600">
+              <em>Email is not valid</em>
+            </span>
+          )}
         </div>
         <div className="mb-5">
           <Input

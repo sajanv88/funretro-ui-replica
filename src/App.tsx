@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,10 +12,10 @@ import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 import NotFound from "./components/NotFound";
-
 import PublicBoard from "./components/PublicBoard";
-
 import AppProvider, { useAuth } from "./context/context";
+import { AppEvent } from "./utils/AppEvent";
+
 function LayoutWrapper() {
   const auth = useAuth();
   const { user } = auth;
@@ -37,19 +37,20 @@ function LayoutWrapper() {
               )}
               strict
             ></Route>
+
             <Route exact path="/not-found" strict>
               <NotFound />
             </Route>
+
             {!user && (
               <>
-                <Route exact path="/signup" strict>
-                  <Signup />
-                </Route>
+                <Redirect path="/" to="/login" />
+
                 <Route exact path="/login" strict>
                   <Login />
                 </Route>
-                <Route path="*">
-                  <Redirect to="/signup" />
+                <Route exact path="/signup" strict>
+                  <Signup />
                 </Route>
               </>
             )}
@@ -76,6 +77,7 @@ function App() {
       <Router>
         <div className="w-full">
           <Header />
+
           <LayoutWrapper />
         </div>
       </Router>

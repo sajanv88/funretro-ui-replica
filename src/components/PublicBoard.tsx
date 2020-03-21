@@ -4,11 +4,15 @@ import Api from "../api/Public";
 import TaskAdd, { TaskDto } from "./TaskAdd";
 import TaskView from "./TaskView";
 import PublicBoardHeader from "./PublicBoardHeader";
-import { BoardColumn, useAuth } from "../context/context";
+import { BoardColumn } from "../context/context";
 import { PrimaryBtn } from "./Button";
 import Loading from "./Loading";
-import { copyLink } from "../utils";
+import { copyLink, anonymousUser } from "../utils";
 import Alert, { Status } from "./Alert";
+import "./PublicBoard.css";
+
+export let ws = new WebSocket("ws://localhost:3002");
+export const toServer = JSON.stringify({ event: "refresh" });
 
 const api = Api();
 
@@ -33,13 +37,8 @@ const getBoards = async function(
   }
 };
 
-const toServer = JSON.stringify({ event: "refresh" });
-const ws = new WebSocket("ws://localhost:3002");
-
 export default ({ signature, router }: PublicBoardProps) => {
   const salt = window.decodeURIComponent(signature);
-  const auth = useAuth();
-  const { user } = auth;
   const [board, setBoard] = useState<any>();
   const [showAlert, setAlert] = useState<boolean>(false);
   const [taskLists, setTaskLists] = useState<TaskDto[]>([]);
@@ -54,13 +53,21 @@ export default ({ signature, router }: PublicBoardProps) => {
         console.log(e);
         router.history.push("/not-found");
       } finally {
-        ws.onopen = function() {
-          console.log("connected");
-          ws.send(toServer);
-        };
+        if (ws.readyState === ws.OPEN) {
+          ws.send(JSON.stringify({ event: "user" }));
+        } else if (ws.readyState === ws.CLOSED) {
+          ws.onopen = function() {
+            console.log("connected");
+            ws.send(toServer);
+          };
+        }
         ws.onmessage = function(response) {
           console.log(response, "message from server");
-          resettingTasks();
+          const { data } = response;
+          const res = JSON.parse(data);
+          if (res.message === "update") {
+            resettingTasks();
+          }
         };
       }
     }
@@ -98,10 +105,12 @@ export default ({ signature, router }: PublicBoardProps) => {
       }
       setTaskLists([...taskLists]);
     } else {
-      const { tasks } = await getBoards(salt);
+      const { tasks, board } = await getBoards(salt);
       const oldTasks = taskLists.filter(
         (t: TaskDto) => t.isEditable || t.isNewTask
       );
+      setBoard({ ...board });
+
       setTaskLists([...oldTasks, ...tasks]);
     }
   };
@@ -146,6 +155,7 @@ export default ({ signature, router }: PublicBoardProps) => {
             onDeleteHandler={onTaskViewDeleteHandler}
             onEditHandler={onEditHandler}
             maxVoteLimit={board.votes}
+            board={board}
           />
         );
       }
@@ -198,7 +208,8 @@ export default ({ signature, router }: PublicBoardProps) => {
       noOfVotes: 0,
       isEditable: false,
       isNewTask: true,
-      id: taskLists.length + 1 // dummy id
+      id: taskLists.length + 1, // dummy id
+      annonymousToken: anonymousUser()
     };
     setTaskLists([newTask, ...taskLists]);
   };
@@ -224,11 +235,11 @@ export default ({ signature, router }: PublicBoardProps) => {
           router={router}
         />
       </div>
-      <div className="flex flex-col md:flex-row flex-wrap -mx-2 overflow-hidden">
+      <div className="area flex flex-col md:flex-row flex-wrap -mx-2 overflow-hidden">
         {board.templates.map((template: BoardColumn) => (
           <div
             key={template.id}
-            className="my-2 px-2 w-full md:overflow-hidden md:w-1/3 lg:w-1/3 xl:w-1/3"
+            className="my-2 px-2 w-full md:overflow-hidden md:w-1/3 lg:w-1/3 xl:w-1/3 border-dashed border-r-4 hide-last-border"
           >
             <div className="flex flex-col">
               <div>

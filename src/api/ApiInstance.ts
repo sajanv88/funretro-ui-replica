@@ -1,3 +1,5 @@
+import { AppEvent } from "../utils/AppEvent";
+
 const axios = require("axios");
 
 export const Api = axios.create({
@@ -11,7 +13,6 @@ Api.interceptors.response.use(
     return response.data;
   },
   function(error: any) {
-    console.log(error.response, "cool");
     return Promise.reject(error);
   }
 );

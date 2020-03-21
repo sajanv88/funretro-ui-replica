@@ -1,4 +1,4 @@
-import React, { MouseEvent } from "react";
+import React, { MouseEvent, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/context";
 import { SecondaryBtn } from "./Button";
@@ -10,6 +10,11 @@ interface HeaderProps {
 
 const RenderCommonNav = function({ children, user }: HeaderProps) {
   const { pathname } = useLocation();
+  const [toggle, setToggle] = useState<boolean>(false);
+  const onToggleMenu = function(e: MouseEvent) {
+    e.stopPropagation();
+    setToggle(toggle => !toggle);
+  };
   return (
     <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-2 fixed w-full z-10 top-0">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
@@ -23,9 +28,10 @@ const RenderCommonNav = function({ children, user }: HeaderProps) {
         </Link>
       </div>
 
-      <div className="block lg:hidden">
+      <div className={`${!toggle ? "lg:hidden" : "block"}`}>
         <button
           id="nav-toggle"
+          onClick={onToggleMenu}
           className="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-600 hover:text-white hover:border-white"
         >
           <svg
@@ -40,26 +46,28 @@ const RenderCommonNav = function({ children, user }: HeaderProps) {
       </div>
       {!user && (
         <div
-          className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block pt-6 lg:pt-0"
-          id="nav-content"
+          className={`w-full flex-grow lg:flex lg:items-center lg:w-auto ${
+            !toggle ? "hidden" : "lg:block"
+          } lg:pt-0"
+          id="nav-content`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">
             {!pathname.includes("public") && (
               <li className="mr-3">
                 <Link
-                  className="inline-block py-2 px-4 text-white no-underline"
-                  to="/login"
+                  className="inline-block text-gray-600 no-underline hover:text-gray-200 hover:text-underline py-2 px-4"
+                  to="/signup"
                 >
-                  Login
+                  Signup
                 </Link>
               </li>
             )}
             <li className="mr-3">
               <Link
-                className="inline-block text-gray-600 no-underline hover:text-gray-200 hover:text-underline py-2 px-4"
-                to="/signup"
+                className="inline-block py-2 px-4 text-white no-underline"
+                to="/login"
               >
-                Signup
+                Login
               </Link>
             </li>
           </ul>

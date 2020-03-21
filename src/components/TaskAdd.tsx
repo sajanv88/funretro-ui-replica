@@ -1,6 +1,7 @@
 import React, { MouseEvent, SyntheticEvent, useState } from "react";
-import Api from "../api/Public";
+import { anonymousUser } from "../utils";
 import { SecondaryBtn } from "./Button";
+import Api from "../api/Public";
 import "./Task.css";
 
 const api = Api();
@@ -24,6 +25,8 @@ export interface TaskDto {
   boardTemplateId: number;
   isEditable?: boolean;
   isNewTask?: boolean;
+  isYours?: string;
+  annonymousToken: string | null;
 }
 
 export default ({
@@ -37,6 +40,7 @@ export default ({
     description: task?.description || "",
     noOfVotes: task?.noOfVotes || 0,
     title: task?.title || "",
+    annonymousToken: anonymousUser(),
     boardTemplateId: task?.boardTemplateId || boardTemplateId
   });
   const onChangeHandler = function(e: SyntheticEvent) {

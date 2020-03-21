@@ -31,6 +31,9 @@ export interface Board {
   templates: BoardColumn[];
   salt: string;
   createdAt: string;
+  disableVotes: boolean;
+  hideVoteCount: boolean;
+  shouldHideTask: boolean;
 }
 export interface User {
   id: number;
