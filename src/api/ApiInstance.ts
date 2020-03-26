@@ -3,7 +3,7 @@ import { AppEvent } from "../utils/AppEvent";
 const axios = require("axios");
 
 export const Api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: `${window.location.protocol}//${window.location.host}`,
   timeout: 0,
   headers: { contentType: "application/json" }
 });

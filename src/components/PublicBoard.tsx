@@ -11,7 +11,7 @@ import { copyLink, anonymousUser } from "../utils";
 import Alert, { Status } from "./Alert";
 import "./PublicBoard.css";
 
-export let ws = new WebSocket("ws://localhost:3002");
+export let ws = new WebSocket(`wss://${window.location.host}`);
 export const toServer = JSON.stringify({ event: "refresh" });
 
 const api = Api();
